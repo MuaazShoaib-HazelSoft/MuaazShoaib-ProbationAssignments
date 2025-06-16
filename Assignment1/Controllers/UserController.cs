@@ -26,21 +26,20 @@ namespace UserManagement.Controllers
         /// Retrieves all users.
         /// </summary>
         [HttpGet("getallusers")]
-        public IActionResult GetAllUsers()
+        public async Task<IActionResult> GetAllUsers()
         {
-            // Validate ModelState if any query/body params exist
             try
             {
-                List<GetUsersDto> users = _userService.GetAllUsers();
+                List<GetUsersDto> users = await _userService.GetAllUsers();
                 if (!users.Any())
                 {
-                    return BadRequest<string>(null, MessagesConstants.NoUsers, false);
+                    return BadRequest(null, MessagesConstants.NoUsers, false);
                 }
-                return Ok<List<GetUsersDto>>(users, MessagesConstants.UsersFetched, true);
+                return Ok(users, MessagesConstants.UsersFetched, true);
             }
             catch (Exception ex)
             {
-                return BadRequest<string>(null, MessagesConstants.ErrorOccured + ex.Message, false);
+                return BadRequest(null, MessagesConstants.ErrorOccured + ex.Message, false);
             }
 
         }
@@ -49,24 +48,24 @@ namespace UserManagement.Controllers
         /// Retrieves a user by their ID.
         /// </summary>
         [HttpGet("getuserbyid/{Id?}")]
-        public IActionResult GetUserById(int Id)
+        public async Task<IActionResult> GetUserById(int Id)
         {
             try
             {
                 if (Id <= 0)
                 {
-                    return BadRequest<string>(null, MessagesConstants.InvalidId, false);
+                    return BadRequest(null, MessagesConstants.InvalidId, false);
                 }
-                GetUsersDto user = _userService.GetUserById(Id);
+                GetUsersDto user = await _userService.GetUserById(Id);
                 if (user == null)
                 {
-                    return BadRequest<string>(null, MessagesConstants.UserNotFound, false);
+                    return BadRequest(null, MessagesConstants.UserNotFound, false);
                 }
-                return Ok<GetUsersDto>(user, MessagesConstants.UserFetched, true);
+                return Ok(user, MessagesConstants.UserFetched, true);
             }
             catch (Exception ex)
             {
-                return BadRequest<string>(null, MessagesConstants.ErrorOccured + ex.Message, false);
+                return BadRequest(null, MessagesConstants.ErrorOccured + ex.Message, false);
             }
         }
 
@@ -74,33 +73,33 @@ namespace UserManagement.Controllers
         /// Adds a new user.
         /// </summary>
         [HttpPost("adduser")]
-        public IActionResult AddUser([FromBody] AddUserDto newUser)
+        public async Task<IActionResult> AddUser([FromBody] AddUserDto newUser)
         {
             try
             {
                 var validationResult = RequestValidator.ValidateRequest(ModelState);
                 if (validationResult != null) return validationResult;
 
-                var resultMessage = _userService.AddUser(newUser);
+                var resultMessage = await _userService.AddUser(newUser);
 
                 if (resultMessage == MessagesConstants.EmailAlreadyExists)
                 {
-                    return BadRequest<string>(null, MessagesConstants.EmailAlreadyExists, false);
+                    return BadRequest(null, MessagesConstants.EmailAlreadyExists, false);
                 }
 
-                return Ok<AddUserDto>(newUser, MessagesConstants.UserAdded, true);
+                return Ok(newUser, MessagesConstants.UserAdded, true);
             }
             catch (Exception ex)
             {
-                return BadRequest<string>(null, MessagesConstants.ErrorOccured + ex.Message, false);
+                return BadRequest(null, MessagesConstants.ErrorOccured + ex.Message, false);
             }
         }
 
         /// <summary>
         /// Updates an existing user's details.
         /// </summary>
-        [HttpPut("updateuserdetails/{Id}")]
-        public IActionResult UpdateUserDetails(int Id, [FromBody] UpdateUserDto updatedUser)
+        [HttpPut("updateuserdetails/{Id?}")]
+        public async Task<IActionResult> UpdateUserDetails(int Id, [FromBody] UpdateUserDto updatedUser)
         {
             try
             {
@@ -109,49 +108,49 @@ namespace UserManagement.Controllers
 
                 if (Id <= 0)
                 {
-                    return BadRequest<string>(null, MessagesConstants.InvalidId, false);
+                    return BadRequest(null, MessagesConstants.InvalidId, false);
                 }
 
-                var resultMessage = _userService.UpdateUser(Id, updatedUser);
+                var resultMessage = await _userService.UpdateUser(Id, updatedUser);
                 if (resultMessage == MessagesConstants.EmailAlreadyExists)
                 {
-                    return BadRequest<string>(null, MessagesConstants.EmailAlreadyExists, false);
+                    return BadRequest(null, MessagesConstants.EmailAlreadyExists, false);
                 }
                 if (resultMessage == MessagesConstants.UserNotFound)
                 {
-                    return BadRequest<string>(null, MessagesConstants.UserNotFound, false);
+                    return BadRequest(null, MessagesConstants.UserNotFound, false);
                 }
-                return Ok<UpdateUserDto>(updatedUser, MessagesConstants.UserUpdated, true);
+                return Ok(updatedUser, MessagesConstants.UserUpdated, true);
             }
             catch (Exception ex)
             {
-                return BadRequest<string>(null, MessagesConstants.ErrorOccured + ex.Message, false);
+                return BadRequest(null, MessagesConstants.ErrorOccured + ex.Message, false);
             }
         }
 
         /// <summary>
         /// Deletes a user by their name and email.
         /// </summary>
-        [HttpDelete("deleteuser/{Id}")]
-        public IActionResult DeleteUser(int Id)
+        [HttpDelete("deleteuser/{Id?}")]
+        public async Task<IActionResult> DeleteUser(int Id)
         {
             try
             {
                 if (Id <= 0)
                 {
-                    return BadRequest<string>(null, MessagesConstants.InvalidId, false);
+                    return BadRequest(null, MessagesConstants.InvalidId, false);
                 }
-                var resultMessage = _userService.DeleteUser(Id);
+                var resultMessage = await _userService.DeleteUser(Id);
                 if (resultMessage == MessagesConstants.UserNotFound)
                 {
-                    return BadRequest<string>(null, MessagesConstants.UserNotFound, false);
+                    return BadRequest(null, MessagesConstants.UserNotFound, false);
                 }
 
-                return Ok<string>(null, MessagesConstants.UserDeleted, true);
+                return Ok(null, MessagesConstants.UserDeleted, true);
             }
             catch (Exception ex)
             {
-                return BadRequest<string>(null, MessagesConstants.ErrorOccured + ex.Message, false);
+                return BadRequest(null, MessagesConstants.ErrorOccured + ex.Message, false);
             }
       
         }

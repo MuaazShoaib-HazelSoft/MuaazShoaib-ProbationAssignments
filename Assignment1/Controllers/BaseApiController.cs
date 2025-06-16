@@ -5,13 +5,13 @@ namespace UserManagementSystem.Controllers
 {
     public class BaseApiController:ControllerBase
     {
-        protected IActionResult Ok<T>(T data, string message,bool success)
+        protected IActionResult Ok(object data, string message,bool success)
         {
-            return Ok(new ApiResponse<T>(data, message, true));
+            return Ok(new ApiResponse<object>(data, message, true));
         }
-        protected IActionResult BadRequest<T>(T data, string message,bool success)
+        protected IActionResult BadRequest(object data, string message,bool success)
         {
-            return BadRequest(new ApiResponse<T>(data, message, false));
+            return BadRequest(new ApiResponse<object>(data, message, false));
         }
     }
 }

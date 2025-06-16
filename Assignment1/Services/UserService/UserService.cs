@@ -2,6 +2,8 @@
 using UserManagementSystem.DTOS.UsersDTO;
 using UserManagementSystem.Models;
 using AutoMapper;
+using UserManagementSystem.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace UserManagementSystem.Services.UserService
 {
@@ -12,84 +14,75 @@ namespace UserManagementSystem.Services.UserService
     public class UserService : IUserService
     {
         
-        private static readonly List<User> s_usersList = new List<User>();
+        //private static readonly List<User> s_usersList = new List<User>();
 
         private readonly IMapper _userMapper;
+        private readonly DataContext _context;
 
-        public UserService(IMapper mapper)
+        public UserService(IMapper mapper, DataContext context)
         {
             _userMapper = mapper;
+            _context = context;
         }
 
         // Add new user.
-        public string AddUser(AddUserDto newUser)
+        public async Task<string> AddUser(AddUserDto newUser)
         {
-            if (s_usersList.Any(u => u.Email == newUser.Email))
+            bool emailExists = await _context.Users.AnyAsync(u => u.Email == newUser.Email);
+            if (emailExists)
             {
-                return MessagesConstants.EmailAlreadyExists; 
+                return MessagesConstants.EmailAlreadyExists;
             }
-
-            var addUser = _userMapper.Map<User>(newUser);
-            addUser.Id = s_usersList.Any() ? s_usersList.Max(u => u.Id) + 1 : 1;
-
-            s_usersList.Add(addUser);
-
+            User addUser = _userMapper.Map<User>(newUser);
+            await _context.Users.AddAsync(addUser);
+            await _context.SaveChangesAsync();
             return MessagesConstants.UserAdded; 
         }
 
         // Delete a user by name and email.
-        public string DeleteUser(int Id)
+        public async Task<string> DeleteUser(int Id)
         {
-            var existingUser = s_usersList.FirstOrDefault(u =>
-               u.Id == Id);
-
+            User existingUser = await _context.Users.FirstOrDefaultAsync(u=> u.Id == Id);
             if (existingUser == null)
             {
                 return MessagesConstants.UserNotFound;
             }
-
-            s_usersList.Remove(existingUser);
-
+            _context.Users.Remove(existingUser);
+            await _context.SaveChangesAsync();
             return MessagesConstants.UserDeleted;
         }
 
         // Get all users.
-        public List<GetUsersDto> GetAllUsers()
+        public async Task<List<GetUsersDto>> GetAllUsers()
         {
-          
-            return _userMapper.Map<List<GetUsersDto>>(s_usersList);
+            List<User> users = await _context.Users.ToListAsync();
+            return  _userMapper.Map<List<GetUsersDto>>(users);
         }
 
         // Get a single user by ID.
-        public GetUsersDto? GetUserById(int id)
+        public async Task<GetUsersDto> GetUserById(int Id)
         {
-
-            var user = s_usersList.FirstOrDefault(u => u.Id == id);
-
-            return user == null ? null : _userMapper.Map<GetUsersDto>(user);
+            User existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == Id);
+            return  _userMapper.Map<GetUsersDto>(existingUser);
         }
 
         // Update an existing user by ID.
-        public string UpdateUser(int id, UpdateUserDto updatedUser)
+        public async Task<string> UpdateUser(int Id, UpdateUserDto updatedUser)
         {
-            var existingUser = s_usersList.FirstOrDefault(u => u.Id == id);
-
+            User existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == Id);
             if (existingUser == null)
             {
                 return MessagesConstants.UserNotFound;
             }
-
             // Prevent updating to an email that another user already has.
-            bool emailExists = s_usersList.Any(u => u.Email == updatedUser.Email && u.Id != id);
-
+            bool emailExists = await _context.Users.AnyAsync(u => u.Email == updatedUser.Email && u.Id != Id); 
             if (emailExists)
             {
                 return MessagesConstants.EmailAlreadyExists; 
             }
-
             // Map updated fields onto existing user.
             _userMapper.Map(updatedUser, existingUser);
-
+            await _context.SaveChangesAsync();
             return MessagesConstants.UserUpdated;
         }
     }

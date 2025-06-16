@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using UserManagementSystem;
+using UserManagementSystem.Data;
 using UserManagementSystem.Models;
 using UserManagementSystem.Services.UserService;
 using static System.Runtime.InteropServices.JavaScript.JSType;
@@ -13,6 +15,7 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddDbContext<DataContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddAutoMapper(typeof(MappingUserProfile));
 builder.Services.AddSwaggerGen();
 builder.Services.Configure<ApiBehaviorOptions>(options =>
