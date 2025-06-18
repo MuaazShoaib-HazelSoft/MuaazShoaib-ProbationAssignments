@@ -3,6 +3,7 @@ using UserManagementSystem.Models;
 
 namespace UserManagementSystem.Controllers
 {
+    [ApiController]
     public class BaseApiController:ControllerBase
     {
         protected IActionResult Ok(object data, string message,bool success)

@@ -8,9 +8,9 @@ namespace UserManagementSystem
     {
         public MappingUserProfile()
         {
-            CreateMap<User, GetUsersDto>();
-            CreateMap<AddUserDto, User>();
-            CreateMap<UpdateUserDto, User>();
+            CreateMap<ApplicationUser, GetUsersDto>();
+            CreateMap<RegisterUserDto, ApplicationUser>();
+            CreateMap<UpdateUserDto, ApplicationUser>();
         }
     }
 }

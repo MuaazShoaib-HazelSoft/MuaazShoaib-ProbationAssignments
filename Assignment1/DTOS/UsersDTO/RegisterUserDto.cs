@@ -8,11 +8,11 @@ namespace UserManagementSystem.DTOS.UsersDTO
     /// exluding Id.
     /// excluding Id.
     /// </summary>
-    public class AddUserDto
+    public class RegisterUserDto
     {
 
-        [Required(ErrorMessage =MessagesConstants.NameRequired)]
-        public string Name { get; set; } = "";
+        [Required(ErrorMessage = MessagesConstants.NameRequired)]
+        public string UserName { get; set; } = "";
 
         [Required(ErrorMessage = MessagesConstants.EmailRequired)]
         [EmailAddress(ErrorMessage = MessagesConstants.InvalidEmail)]

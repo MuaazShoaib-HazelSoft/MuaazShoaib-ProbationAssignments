@@ -1,23 +1,22 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Identity.Client;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using UserManagementSystem.Models;
 
 namespace UserManagementSystem.Data
 {
-    public class DataContext:DbContext
+    public class DataContext : IdentityDbContext<ApplicationUser>
     {
-        public DataContext(DbContextOptions<DataContext> options):base(options)
+        public DataContext(DbContextOptions<DataContext> options) : base(options)
         {
-         
         }
-
-        public DbSet<User> Users { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<User>(entity =>
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<ApplicationUser>(entity =>
             {
-               entity.HasIndex(e => e.Email).IsUnique();
+                entity.HasIndex(e => e.Email).IsUnique();
             });
         }
     }

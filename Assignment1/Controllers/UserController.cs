@@ -1,6 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using UserManagementSystem;
 using UserManagementSystem.Controllers;
+using UserManagementSystem.Data;
 using UserManagementSystem.DTOS.UsersDTO;
 using UserManagementSystem.Models;
 using UserManagementSystem.Services.UserService;
@@ -13,19 +16,24 @@ namespace UserManagement.Controllers
     /// </summary>
     [ApiController]
     [Route("[controller]")]
+    [Authorize]
     public class UserController : BaseApiController
     {
         private readonly IUserService _userService;
 
-        public UserController(IUserService userService)
+        private readonly IAuthService _authRepo;
+        public UserController(IUserService userService, IAuthService authRepo)
         {
             _userService = userService;
+            _authRepo = authRepo;
         }
 
         /// <summary>
         /// Retrieves all users.
         /// </summary>
+        [AllowAnonymous]
         [HttpGet("getallusers")]
+
         public async Task<IActionResult> GetAllUsers()
         {
             try
@@ -41,21 +49,17 @@ namespace UserManagement.Controllers
             {
                 return BadRequest(null, MessagesConstants.ErrorOccured + ex.Message, false);
             }
-
         }
-
         /// <summary>
         /// Retrieves a user by their ID.
         /// </summary>
-        [HttpGet("getuserbyid/{Id?}")]
-        public async Task<IActionResult> GetUserById(int Id)
+        ///
+        [HttpGet("getuserbyid")]
+        public async Task<IActionResult> GetUserById()
         {
             try
-            {
-                if (Id <= 0)
-                {
-                    return BadRequest(null, MessagesConstants.InvalidId, false);
-                }
+            { 
+                string Id = GetUserId();
                 GetUsersDto user = await _userService.GetUserById(Id);
                 if (user == null)
                 {
@@ -68,50 +72,25 @@ namespace UserManagement.Controllers
                 return BadRequest(null, MessagesConstants.ErrorOccured + ex.Message, false);
             }
         }
-
-        /// <summary>
-        /// Adds a new user.
-        /// </summary>
-        [HttpPost("adduser")]
-        public async Task<IActionResult> AddUser([FromBody] AddUserDto newUser)
-        {
-            try
-            {
-                var validationResult = RequestValidator.ValidateRequest(ModelState);
-                if (validationResult != null) return validationResult;
-
-                var resultMessage = await _userService.AddUser(newUser);
-
-                if (resultMessage == MessagesConstants.EmailAlreadyExists)
-                {
-                    return BadRequest(null, MessagesConstants.EmailAlreadyExists, false);
-                }
-
-                return Ok(newUser, MessagesConstants.UserAdded, true);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(null, MessagesConstants.ErrorOccured + ex.Message, false);
-            }
-        }
-
         /// <summary>
         /// Updates an existing user's details.
         /// </summary>
-        [HttpPut("updateuserdetails/{Id?}")]
-        public async Task<IActionResult> UpdateUserDetails(int Id, [FromBody] UpdateUserDto updatedUser)
+        [HttpPut("updateuserdetails")]
+        public async Task<IActionResult> UpdateUserDetails( [FromBody] UpdateUserDto updatedUser)
         {
             try
             {
                 var validationResult = RequestValidator.ValidateRequest(ModelState);
                 if (validationResult != null) return validationResult;
 
-                if (Id <= 0)
-                {
-                    return BadRequest(null, MessagesConstants.InvalidId, false);
-                }
-
+                string Id = GetUserId();
                 var resultMessage = await _userService.UpdateUser(Id, updatedUser);
+                var passwordUpdate = await _authRepo.UpdatePassword(Id,updatedUser.Password);
+
+                if(passwordUpdate != MessagesConstants.PasswordUpdated) {
+
+                    return BadRequest(null, passwordUpdate, false);
+                }
                 if (resultMessage == MessagesConstants.EmailAlreadyExists)
                 {
                     return BadRequest(null, MessagesConstants.EmailAlreadyExists, false);
@@ -119,6 +98,10 @@ namespace UserManagement.Controllers
                 if (resultMessage == MessagesConstants.UserNotFound)
                 {
                     return BadRequest(null, MessagesConstants.UserNotFound, false);
+                }
+                if (resultMessage == MessagesConstants.UpdationFailed)
+                {
+                    return BadRequest(null, MessagesConstants.UpdationFailed, false);
                 }
                 return Ok(updatedUser, MessagesConstants.UserUpdated, true);
             }
@@ -131,21 +114,22 @@ namespace UserManagement.Controllers
         /// <summary>
         /// Deletes a user by their name and email.
         /// </summary>
-        [HttpDelete("deleteuser/{Id?}")]
-        public async Task<IActionResult> DeleteUser(int Id)
+        /// 
+        [HttpDelete("deleteuser")]
+        public async Task<IActionResult> DeleteUser()
         {
             try
             {
-                if (Id <= 0)
-                {
-                    return BadRequest(null, MessagesConstants.InvalidId, false);
-                }
+                string Id = GetUserId();
                 var resultMessage = await _userService.DeleteUser(Id);
                 if (resultMessage == MessagesConstants.UserNotFound)
                 {
                     return BadRequest(null, MessagesConstants.UserNotFound, false);
                 }
-
+                if (resultMessage == MessagesConstants.DeletionFailed)
+                {
+                    return BadRequest(null, MessagesConstants.DeletionFailed, false);
+                }
                 return Ok(null, MessagesConstants.UserDeleted, true);
             }
             catch (Exception ex)
@@ -154,5 +138,10 @@ namespace UserManagement.Controllers
             }
       
         }
+        public string GetUserId()
+        {
+            return User?.Claims?.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+        }
+
     }
 }

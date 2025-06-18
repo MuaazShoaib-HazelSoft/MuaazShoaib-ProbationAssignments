@@ -6,7 +6,7 @@ namespace UserManagementSystem.DTOS.UsersDTO
     /// Class of Update User Dto 
     /// excluding Id.
     /// </summary>
-    public class UpdateUserDto:AddUserDto
+    public class UpdateUserDto:RegisterUserDto
     {
        
     }
