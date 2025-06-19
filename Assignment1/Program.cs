@@ -11,6 +11,7 @@ using System.Text;
 using UserManagementSystem;
 using UserManagementSystem.Data;
 using UserManagementSystem.Models;
+using UserManagementSystem.Repositories;
 using UserManagementSystem.Services.UserService;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
@@ -21,6 +22,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 builder.Services.AddTransient<ContentTypeValidationMiddleware>();
 
 builder.Services.AddDbContext<DataContext>(options =>
