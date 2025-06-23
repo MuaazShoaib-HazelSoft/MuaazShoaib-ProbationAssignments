@@ -24,11 +24,10 @@ namespace UserManagementSystem
                      null,
                     MessagesConstants.InvalidContentType,
                     false
-           );
+                );
                     await context.Response.WriteAsJsonAsync(errorResponse);
                 }
             }
-
             await next(context); // Call the next middleware
         }
     }

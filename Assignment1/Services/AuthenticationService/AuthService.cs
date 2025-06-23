@@ -29,19 +29,19 @@ namespace UserManagementSystem.Data
         /// <summary>
         /// Register all the users.
         /// </summary>
-        public async Task<string> RegisterUser(RegisterUserDto newUser)
+        public async Task RegisterUser(RegisterUserDto newUser)
         {
             var userExists = await _userManager.FindByEmailAsync(newUser.Email);
             if (userExists != null)
-                return MessagesConstants.EmailAlreadyExists;
+                throw new Exception(MessagesConstants.EmailAlreadyExists);
+
             ApplicationUser registerUser = _userMapper.Map<ApplicationUser>(newUser);
             var result =  await _userManager.CreateAsync(registerUser, newUser.Password);
-            if (result.Succeeded)
+            if (!result.Succeeded)
             {
-                return MessagesConstants.UserAdded;
+                string errors = string.Join(", ", result.Errors.Select(e => e.Description));
+                throw new Exception(errors);
             }
-            string errors = string.Join(", ", result.Errors.Select(e => e.Description));
-            return $"Registration failed: {errors}";
         }
 
         /// <summary>
@@ -51,11 +51,11 @@ namespace UserManagementSystem.Data
         {
             var user = await _userManager.FindByEmailAsync(loginUser.Email);
             if (user == null)
-                return MessagesConstants.UserNotFound;
+                throw new Exception(MessagesConstants.InvalidUser);
 
             var isValidPassword = await _userManager.CheckPasswordAsync(user, loginUser.Password);
             if (!isValidPassword)
-                return MessagesConstants.UnmatchedPasswords;
+                throw new Exception(MessagesConstants.InvalidUser);
 
             return await CreateToken(user);
         }
@@ -92,20 +92,7 @@ namespace UserManagementSystem.Data
 
             return tokenHandler.WriteToken(token);
         }
-        /// <summary>
-        /// Method for Updating Password.
-        /// </summary>
-        public async Task<string> UpdatePassword(string userId, string newPassword)
-        {
-            var user = await _userManager.FindByIdAsync(userId);
-            if (user == null)
-                return MessagesConstants.UserNotFound;
-
-            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
-            var result = await _userManager.ResetPasswordAsync(user, token, newPassword);
-            string errors = string.Join(", ", result.Errors.Select(e => e.Description));
-            return result.Succeeded ? MessagesConstants.PasswordUpdated : errors;
-        }
+    
     }
 }
 

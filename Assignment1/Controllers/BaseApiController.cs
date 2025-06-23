@@ -8,11 +8,12 @@ namespace UserManagementSystem.Controllers
     {
         protected IActionResult Ok(object data, string message,bool success)
         {
-            return Ok(new ApiResponse<object>(data, message, true));
+            return Ok(new ApiResponse<object>(data, message, success));
         }
+
         protected IActionResult BadRequest(object data, string message,bool success)
         {
-            return BadRequest(new ApiResponse<object>(data, message, false));
+            return BadRequest(new ApiResponse<object>(data, message, success));
         }
     }
 }

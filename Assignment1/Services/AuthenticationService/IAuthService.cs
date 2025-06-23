@@ -8,8 +8,7 @@ namespace UserManagementSystem.Data
     /// </summary>
     public interface IAuthService
     {
-        Task<string> RegisterUser(RegisterUserDto newUser);
+        Task  RegisterUser(RegisterUserDto newUser);
         Task<string> LoginUser(LoginUserDto loginUser);
-        Task<string> UpdatePassword(string Id, string newPassword);
     }
 }

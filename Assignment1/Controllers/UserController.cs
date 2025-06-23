@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using UserManagementSystem;
@@ -20,18 +21,17 @@ namespace UserManagement.Controllers
     public class UserController : BaseApiController
     {
         private readonly IUserService _userService;
+        private readonly IMapper _mapper;
 
-        private readonly IAuthService _authRepo;
-        public UserController(IUserService userService, IAuthService authRepo)
+        public UserController(IUserService userService,IMapper mapper)
         {
             _userService = userService;
-            _authRepo = authRepo;
+            _mapper = mapper;
         }
 
         /// <summary>
         /// Retrieves all users.
-        /// </summary>
-        [AllowAnonymous]
+        /// </summary
         [HttpGet("getallusers")]
 
         public async Task<IActionResult> GetAllUsers()
@@ -39,75 +39,45 @@ namespace UserManagement.Controllers
             try
             {
                 List<GetUsersDto> users = await _userService.GetAllUsers();
-                if (!users.Any())
-                {
-                    return BadRequest(null, MessagesConstants.NoUsers, false);
-                }
                 return Ok(users, MessagesConstants.UsersFetched, true);
             }
             catch (Exception ex)
             {
-                return BadRequest(null, MessagesConstants.ErrorOccured + ex.Message, false);
+                return BadRequest(null, ex.Message, false);
             }
         }
         /// <summary>
         /// Retrieves a user by their ID.
         /// </summary>
         ///
-        [HttpGet("getuserbyid")]
-        public async Task<IActionResult> GetUserById()
+        [HttpGet("getuserbyid/{Id?}")]
+        public async Task<IActionResult> GetUserById([FromRoute] string? Id)
         {
             try
             { 
-                string Id = GetUserId();
                 GetUsersDto user = await _userService.GetUserById(Id);
-                if (user == null)
-                {
-                    return BadRequest(null, MessagesConstants.UserNotFound, false);
-                }
                 return Ok(user, MessagesConstants.UserFetched, true);
             }
             catch (Exception ex)
             {
-                return BadRequest(null, MessagesConstants.ErrorOccured + ex.Message, false);
+                return BadRequest(null, ex.Message, false);
             }
         }
         /// <summary>
         /// Updates an existing user's details.
         /// </summary>
-        [HttpPut("updateuserdetails")]
-        public async Task<IActionResult> UpdateUserDetails( [FromBody] UpdateUserDto updatedUser)
+        [HttpPut("updateuserdetails/{Id?}")]
+        public async Task<IActionResult> UpdateUserDetails([FromRoute]  string? Id, RegisterUserDto userToUpdate)
         {
             try
-            {
-                var validationResult = RequestValidator.ValidateRequest(ModelState);
-                if (validationResult != null) return validationResult;
-
-                string Id = GetUserId();
-                var resultMessage = await _userService.UpdateUser(Id, updatedUser);
-                var passwordUpdate = await _authRepo.UpdatePassword(Id,updatedUser.Password);
-
-                if(passwordUpdate != MessagesConstants.PasswordUpdated) {
-
-                    return BadRequest(null, passwordUpdate, false);
-                }
-                if (resultMessage == MessagesConstants.EmailAlreadyExists)
-                {
-                    return BadRequest(null, MessagesConstants.EmailAlreadyExists, false);
-                }
-                if (resultMessage == MessagesConstants.UserNotFound)
-                {
-                    return BadRequest(null, MessagesConstants.UserNotFound, false);
-                }
-                if (resultMessage == MessagesConstants.UpdationFailed)
-                {
-                    return BadRequest(null, MessagesConstants.UpdationFailed, false);
-                }
-                return Ok(updatedUser, MessagesConstants.UserUpdated, true);
+            { 
+                var updatedUser = await _userService.UpdateUser(Id, userToUpdate);
+                var updatedDto = _mapper.Map<GetUsersDto>(updatedUser);
+                return Ok(updatedDto, MessagesConstants.UserUpdated, true);
             }
             catch (Exception ex)
             {
-                return BadRequest(null, MessagesConstants.ErrorOccured + ex.Message, false);
+                return BadRequest(null, ex.Message, false);
             }
         }
 
@@ -115,32 +85,31 @@ namespace UserManagement.Controllers
         /// Deletes a user by their name and email.
         /// </summary>
         /// 
-        [HttpDelete("deleteuser")]
-        public async Task<IActionResult> DeleteUser()
+        [HttpDelete("deleteuser/{Id?}")]
+        public async Task<IActionResult> DeleteUser([FromRoute]  string? Id)
         {
             try
             {
-                string Id = GetUserId();
-                var resultMessage = await _userService.DeleteUser(Id);
-                if (resultMessage == MessagesConstants.UserNotFound)
-                {
-                    return BadRequest(null, MessagesConstants.UserNotFound, false);
-                }
-                if (resultMessage == MessagesConstants.DeletionFailed)
-                {
-                    return BadRequest(null, MessagesConstants.DeletionFailed, false);
-                }
-                return Ok(null, MessagesConstants.UserDeleted, true);
+                 await _userService.DeleteUser(Id);
+                 return Ok(null, MessagesConstants.UserDeleted, true);
             }
             catch (Exception ex)
             {
-                return BadRequest(null, MessagesConstants.ErrorOccured + ex.Message, false);
+                return BadRequest(null, ex.Message, false);
             }
-      
         }
-        public string GetUserId()
+        [HttpGet("getpagedusers")]
+        public async Task<IActionResult> GetPagedUsers([FromQuery] PaginationQueryModel usersViewModel)
         {
-            return User?.Claims?.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+            try
+            {
+                var usersList = await _userService.GetPagedUsers(usersViewModel);
+                return Ok(usersList, MessagesConstants.UserFetched, true);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(null, ex.Message, false);
+            }
         }
 
     }

@@ -10,7 +10,6 @@ namespace UserManagementSystem
         {
             CreateMap<ApplicationUser, GetUsersDto>();
             CreateMap<RegisterUserDto, ApplicationUser>();
-            CreateMap<UpdateUserDto, ApplicationUser>();
         }
     }
 }

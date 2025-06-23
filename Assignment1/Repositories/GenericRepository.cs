@@ -1,6 +1,10 @@
 ﻿
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Dynamic.Core;
+using System.Linq.Expressions;
 using UserManagementSystem.Data;
+using UserManagementSystem.DTOS.UsersDTO;
+using UserManagementSystem.Models;
 
 namespace UserManagementSystem.Repositories
 {
@@ -14,7 +18,7 @@ namespace UserManagementSystem.Repositories
             _context = context;
             _entity = _context.Set<T>();
         }
-        public async Task<bool> Add(T model)
+        public async Task<bool> AddAsync(T model)
         {
             try
             {
@@ -26,7 +30,7 @@ namespace UserManagementSystem.Repositories
                 return false;
             }
         }
-        public async Task<bool> Delete(T model)
+        public async Task<bool> DeleteAsync(T model)
         {
             try
             {
@@ -38,14 +42,34 @@ namespace UserManagementSystem.Repositories
                 return false;
             }
         }
-        public async Task<IEnumerable<T>> GetAll()
+        public async Task<IEnumerable<T>> GetAllAsync()
         {
            return  await _entity.ToListAsync();
         }
 
-        public async Task<T> GetById(object Id)
+        public async Task<T> GetByIdAsync(object Id)
         {
             return await _entity.FindAsync(Id);
+        }
+        public async Task<IEnumerable<T>> GetPagedDataAsync( PaginationQueryModel paginationQueryModel)
+        {
+            var query = QueryAble();
+            if (!string.IsNullOrEmpty(paginationQueryModel.SortColoumn))  
+                query = query.OrderBy(paginationQueryModel.SortColoumn);
+
+            if (!string.IsNullOrEmpty(paginationQueryModel.SearchItem))
+                query = query.Where(paginationQueryModel.SearchItem);
+
+            int totalCount = await query.CountAsync();
+            int totalPages = (int)Math.Ceiling((double)totalCount / paginationQueryModel.PageSize);
+            int skip = (paginationQueryModel.PageNumber - 1) * paginationQueryModel.PageSize;
+            var result = await query.Skip(skip).Take(paginationQueryModel.PageSize).ToListAsync();        
+            return result;
+        }
+
+        public IQueryable<T> QueryAble()
+        {
+            return _entity.AsQueryable();
         }
 
         public async Task SaveChangesAsync()
@@ -53,7 +77,7 @@ namespace UserManagementSystem.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task<bool> Update(T model)
+        public async Task<bool> UpdateAsync(T model)
         {
             try
             {

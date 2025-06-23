@@ -22,7 +22,7 @@ namespace UserManagementSystem.DTOS.UsersDTO
         [MinLength(5, ErrorMessage = MessagesConstants.InvalidPassword)]
         public string Password { get; set; } = "";
 
-        [Range(18, 100, ErrorMessage = MessagesConstants.AgeRangeError)]
-        public int Age { get; set; }
+        [Required(ErrorMessage = MessagesConstants.AgeRequired)]
+        public int? Age { get; set; }
     }
 }

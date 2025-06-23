@@ -10,6 +10,7 @@ using Microsoft.OpenApi.Models;
 using System.Text;
 using UserManagementSystem;
 using UserManagementSystem.Data;
+using UserManagementSystem.Filters;
 using UserManagementSystem.Models;
 using UserManagementSystem.Repositories;
 using UserManagementSystem.Services.UserService;
@@ -64,10 +65,15 @@ builder.Services.AddAuthentication(options =>
         )
     };
 });
+builder.Services.AddControllers(options =>
+{
+    options.Filters.Add<RequestValidationFilter>();
+});
 
 var app = builder.Build();
 
     app.UseMiddleware<ContentTypeValidationMiddleware>();
+    
     // middleware to return 401 and 405 responses
     app.UseStatusCodePages(async context =>
     {

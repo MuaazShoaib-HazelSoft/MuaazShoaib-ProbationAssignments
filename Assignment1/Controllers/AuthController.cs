@@ -8,64 +8,42 @@ using UserManagementSystem.Utils;
 namespace UserManagementSystem.Controllers
 {
     [ApiController]
+    [Authorize]
     [Route("[controller]")]
     public class AuthController:BaseApiController
     {
-        private readonly IAuthService _authRepo;
+        private readonly IAuthService _authService;
 
-        public AuthController(IAuthService authRepo)
+        public AuthController(IAuthService authService)
         {
-            _authRepo = authRepo;
+            _authService = authService;
         }
         [HttpPost("registeruser")]
         public async Task<IActionResult> RegisterUser(RegisterUserDto newUser)
         {
             try
             {
-                var validationResult = RequestValidator.ValidateRequest(ModelState);
-                if (validationResult != null) return validationResult;
-
-                var resultMessage = await _authRepo.RegisterUser(newUser);
-
-                if (resultMessage == MessagesConstants.EmailAlreadyExists)
-                {
-                    return BadRequest(null, MessagesConstants.EmailAlreadyExists, false);
-                }
-                if(resultMessage != MessagesConstants.UserAdded)
-                {
-                    return BadRequest(null, resultMessage, false);
-                }
-
-                return Ok(newUser, resultMessage, true);
+                 await _authService.RegisterUser(newUser);
+                 return Ok(null, MessagesConstants.UserAdded, true);
             }
             catch (Exception ex)
             {
-                return BadRequest(null, MessagesConstants.ErrorOccured + ex.Message, false);
+                return BadRequest(null, ex.Message, false);
             }
 
         }
+        [AllowAnonymous]
         [HttpPost("loginuser")]
         public async Task<IActionResult> LoginUser(LoginUserDto loginUserDto)
         {
             try
             {
-                var validationResult = RequestValidator.ValidateRequest(ModelState);
-                if (validationResult != null) return validationResult;
-                var resultMessage = await _authRepo.LoginUser(loginUserDto);
-                if (resultMessage == MessagesConstants.UserNotFound)
-                {
-                    return BadRequest(null, MessagesConstants.UserNotFound, false);
-                }
-                if (resultMessage == MessagesConstants.UnmatchedPasswords)
-                {
-                    return BadRequest(null, MessagesConstants.UnmatchedPasswords, false);
-                }
-
-                return Ok(resultMessage, MessagesConstants.UserLogin, true);
+                var token = await _authService.LoginUser(loginUserDto);
+                return Ok(token, MessagesConstants.UserLogin, true);
             }
             catch (Exception ex)
             {
-                return BadRequest(null, MessagesConstants.ErrorOccured + ex.Message, false);
+                return BadRequest(null, ex.Message, false);
             }
         }
 
