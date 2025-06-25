@@ -6,7 +6,7 @@ using UserManagementSystem.Data;
 using UserManagementSystem.DTOS.UsersDTO;
 using UserManagementSystem.Models;
 
-namespace UserManagementSystem.Repositories
+namespace UserManagementSystem.Repositories.GenericRepositories
 {
     public class GenericRepository<T> : IGenericRepository<T> where T : class
     {
@@ -51,20 +51,20 @@ namespace UserManagementSystem.Repositories
         {
             return await _entity.FindAsync(Id);
         }
-        public async Task<IEnumerable<T>> GetPagedDataAsync( PaginationQueryModel paginationQueryModel)
+        public async Task<(IEnumerable<T> Items, int totalPages)> GetPagedDataAsync(PaginationQueryModel paginationQueryModel)
         {
             var query = QueryAble();
             if (!string.IsNullOrEmpty(paginationQueryModel.SortColoumn))  
                 query = query.OrderBy(paginationQueryModel.SortColoumn);
 
-            if (!string.IsNullOrEmpty(paginationQueryModel.SearchItem))
-                query = query.Where(paginationQueryModel.SearchItem);
+            if (!string.IsNullOrEmpty(paginationQueryModel.Search))
+                query = query.Where(paginationQueryModel.Search);
 
             int totalCount = await query.CountAsync();
             int totalPages = (int)Math.Ceiling((double)totalCount / paginationQueryModel.PageSize);
             int skip = (paginationQueryModel.PageNumber - 1) * paginationQueryModel.PageSize;
-            var result = await query.Skip(skip).Take(paginationQueryModel.PageSize).ToListAsync();        
-            return result;
+            var items = await query.Skip(skip).Take(paginationQueryModel.PageSize).ToListAsync();
+            return (items,totalPages);
         }
 
         public IQueryable<T> QueryAble()

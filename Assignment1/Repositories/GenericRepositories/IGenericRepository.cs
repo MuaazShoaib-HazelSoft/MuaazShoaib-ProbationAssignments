@@ -1,7 +1,7 @@
 ﻿using System.Linq.Expressions;
 using UserManagementSystem.Models;
 
-namespace UserManagementSystem.Repositories
+namespace UserManagementSystem.Repositories.GenericRepositories
 {
     public interface IGenericRepository<T> where T : class
     {
@@ -12,7 +12,7 @@ namespace UserManagementSystem.Repositories
         Task<bool> DeleteAsync(T model);
         Task  SaveChangesAsync();
         IQueryable<T> QueryAble();
-        Task<IEnumerable<T>> GetPagedDataAsync(PaginationQueryModel paginationQueryModel);
-        
+        Task<(IEnumerable<T> Items, int totalPages)> GetPagedDataAsync(PaginationQueryModel paginationQueryModel);
+
     }
 }

@@ -12,7 +12,9 @@ using UserManagementSystem;
 using UserManagementSystem.Data;
 using UserManagementSystem.Filters;
 using UserManagementSystem.Models;
-using UserManagementSystem.Repositories;
+using UserManagementSystem.Repositories.GenericRepositories;
+using UserManagementSystem.Repositories.UserRepositories;
+using UserManagementSystem.Services.AuthenticationService;
 using UserManagementSystem.Services.UserService;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
@@ -20,9 +22,12 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllers();
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IAuthRepository, AuthRepository>();
+builder.Services.AddScoped<IEmailSender, EmailSender>();
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 builder.Services.AddTransient<ContentTypeValidationMiddleware>();
 

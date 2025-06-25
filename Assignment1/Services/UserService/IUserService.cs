@@ -14,7 +14,7 @@ namespace UserManagementSystem.Services.UserService
         Task<GetUsersDto> GetUserById(string Id);
         Task<ApplicationUser>  UpdateUser(string Id, RegisterUserDto updatedUser);
         Task DeleteUser(string Id);
-        Task<List<GetUsersDto>> GetPagedUsers(PaginationQueryModel usersViewModel);
+        Task<(List<GetUsersDto> Items, int TotalPages)> GetPagedUsers(PaginationQueryModel paginationQueryModel);
 
     }
 }

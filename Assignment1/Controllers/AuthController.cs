@@ -46,6 +46,20 @@ namespace UserManagementSystem.Controllers
                 return BadRequest(null, ex.Message, false);
             }
         }
+        [AllowAnonymous]
+        [HttpGet("confirm-email")]
+        public async Task<IActionResult> ConfirmEmail([FromQuery] string email, [FromQuery] string token)
+        {
+            try
+            {
+                await _authService.ConfirmEmail(email, token);
+                return Ok(null, MessagesConstants.EmailConfirmationSuccess, true);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(null, ex.Message, false);
+            }
+        }
 
     }
 

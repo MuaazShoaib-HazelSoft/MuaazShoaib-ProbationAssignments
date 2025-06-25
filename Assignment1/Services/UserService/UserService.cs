@@ -7,7 +7,8 @@ using System.Text.RegularExpressions;
 using UserManagementSystem.Data;
 using UserManagementSystem.DTOS.UsersDTO;
 using UserManagementSystem.Models;
-using UserManagementSystem.Repositories;
+using UserManagementSystem.Repositories.GenericRepositories;
+using UserManagementSystem.Repositories.UserRepositories;
 using UserManagementSystem.Utils;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 using static System.Runtime.InteropServices.JavaScript.JSType;
@@ -22,13 +23,13 @@ namespace UserManagementSystem.Services.UserService
     {
         
         private readonly IMapper _userMapper;
-        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IAuthRepository _authRepository;
         private readonly IGenericRepository<ApplicationUser> _userRepository;
-        public UserService(IMapper mapper, UserManager<ApplicationUser> userManager,IGenericRepository<ApplicationUser> userRepository)
+        public UserService(IMapper mapper,IGenericRepository<ApplicationUser> userRepository,IAuthRepository authRepository)
         {
             _userMapper = mapper;
-            _userManager = userManager;
             _userRepository = userRepository;
+            _authRepository = authRepository;
         }
         // Delete a user by name and email.
         public async Task DeleteUser(string Id)
@@ -79,14 +80,14 @@ namespace UserManagementSystem.Services.UserService
             if (existingUser == null)
                 throw new Exception(MessagesConstants.UserNotFound);
 
-            var userWithEmail = await _userManager.FindByEmailAsync(updatedUser.Email);
+            var userWithEmail = await _authRepository.FindUserByEmailAsync(updatedUser.Email); 
             if (userWithEmail != null && userWithEmail.Id != existingUser.Id)
                 throw new Exception(MessagesConstants.EmailAlreadyExists);
 
             _userMapper.Map(updatedUser, existingUser);
 
-            var token = await _userManager.GeneratePasswordResetTokenAsync(existingUser);
-            var result = await _userManager.ResetPasswordAsync(existingUser, token, updatedUser.Password);
+            var token = await _authRepository.GeneratePasswordResetTokenAsync(existingUser);
+            var result = await _authRepository.ResetPasswordAsync(existingUser, token, updatedUser.Password);
             if (!result.Succeeded)
                 throw new Exception(string.Join(", ", result.Errors.Select(e => e.Description)));
 
@@ -97,50 +98,14 @@ namespace UserManagementSystem.Services.UserService
             await _userRepository.SaveChangesAsync();
             return existingUser;
         }
-        public async Task<List<GetUsersDto>> GetPagedUsers(PaginationQueryModel usersViewModel)
+        public async Task<(List<GetUsersDto> Items, int TotalPages)> GetPagedUsers(PaginationQueryModel paginationQueryModel)
         {
-        
-            //if (!string.IsNullOrEmpty(usersViewModel.SearchItem))
-
-            //{
-            //    var searchItem = usersViewModel.SearchItem;
-            //    bool isNumeric = int.TryParse(searchItem, out int searchAge);
-            //    usersQuery = usersQuery.Where(u => u.UserName.Contains(searchItem) || u.Email.Contains(searchItem) || (isNumeric && u.Age == searchAge));
-            //}
-            //if (!string.IsNullOrEmpty(usersViewModel.SortColoumn))
-            //{
-            //    if (usersViewModel.isDescending)
-            //    {
-            //        usersQuery = usersQuery.OrderByDescending(e => EF.Property<object>(e, usersViewModel.SortColoumn));
-            //    }
-
-            //    else
-            //    {
-            //       usersQuery = usersQuery.OrderBy(e => EF.Property<object>(e, usersViewModel.SortColoumn));
-            //    }
-
-            //}
-            if (usersViewModel.PageNumber < 1)
-                usersViewModel.PageNumber = 1;
-
-            if (usersViewModel.PageSize < 1)
-                usersViewModel.PageSize = 3;
-
-            //var skipPages = (usersViewModel.PageNumber - 1) * usersViewModel.PageSize;
-            //usersQuery = usersQuery.Skip(skipPages).Take(usersViewModel.PageSize);
-            //var chList = await usersQuery.ToListAsync();
-
-            //if (!chList.Any())
-            //    throw new Exception(MessagesConstants.UnmatchedCriteria);
-
-            //var list = _userMapper.Map<List<GetUsersDto>>(chList);
-            //return list;
-
-            var result = await _userRepository.GetPagedDataAsync(usersViewModel);
-            if (!result.Any())
+            var (items,totalPages) = await _userRepository.GetPagedDataAsync(paginationQueryModel);
+            if (!items.Any())
                 throw new Exception(MessagesConstants.UnmatchedCriteria);
-            var userslist =  _userMapper.Map<List<GetUsersDto>>(result);
-            return userslist;
+
+            var userslist =  _userMapper.Map<List<GetUsersDto>>(items);
+            return (userslist,totalPages);
         }
     }
 }

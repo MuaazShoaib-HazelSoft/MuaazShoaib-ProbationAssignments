@@ -103,8 +103,13 @@ namespace UserManagement.Controllers
         {
             try
             {
-                var usersList = await _userService.GetPagedUsers(usersViewModel);
-                return Ok(usersList, MessagesConstants.UserFetched, true);
+                var (usersList,totalPages) = await _userService.GetPagedUsers(usersViewModel);
+                var response = new PaginatedResponse<GetUsersDto>
+                {
+                    TotalPages = totalPages,
+                    Items = usersList,
+                };
+                return Ok(response, MessagesConstants.UserFetched, true);
             }
             catch (Exception ex)
             {
