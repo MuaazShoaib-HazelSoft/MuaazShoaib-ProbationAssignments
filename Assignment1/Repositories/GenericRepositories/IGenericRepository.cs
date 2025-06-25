@@ -12,7 +12,7 @@ namespace UserManagementSystem.Repositories.GenericRepositories
         Task<bool> DeleteAsync(T model);
         Task  SaveChangesAsync();
         IQueryable<T> QueryAble();
-        Task<(IEnumerable<T> Items, int totalPages)> GetPagedDataAsync(PaginationQueryModel paginationQueryModel);
+        Task<PaginatedResponse<T>> GetPagedDataAsync(PaginationQueryModel paginationQueryModel);
 
     }
 }

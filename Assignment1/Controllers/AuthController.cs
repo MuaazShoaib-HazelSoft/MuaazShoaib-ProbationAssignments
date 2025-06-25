@@ -2,8 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using UserManagementSystem.Data;
 using UserManagementSystem.DTOS.UsersDTO;
-using UserManagementSystem.Models;
-using UserManagementSystem.Utils;
+
+
 
 namespace UserManagementSystem.Controllers
 {
@@ -53,7 +53,7 @@ namespace UserManagementSystem.Controllers
             try
             {
                 await _authService.ConfirmEmail(email, token);
-                return Ok(null, MessagesConstants.EmailConfirmationSuccess, true);
+                return Ok(null, MessagesConstants.EmailConfirmationSuccess,true);
             }
             catch (Exception ex)
             {

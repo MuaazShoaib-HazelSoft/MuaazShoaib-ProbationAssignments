@@ -29,7 +29,7 @@
         public const string InvalidContentType = "415 Unsupported Media Type: Missing Content-Type or Body";
         public const string UnmatchedCriteria = "No User Found.";
         public const string FailedEmailConfirmation = "Email Confirmation Failed. Token may be invalid or expired.";
-        public const string EmailConfirmationSuccess = "Email Confirmed Successfully.";
+        public const string EmailConfirmationSuccess = "Your Email has been Confirmed Successfully.";
         public const string EmailNotConfirmedYet = "Please Confirm Your Email before Logging In.";
 
         //Required Messages
@@ -37,6 +37,7 @@
         public const string EmailRequired = "Email is Required";
         public const string PasswordRequired = "Password is Required";
         public const string AgeRequired = "Age is Required";
+        public const string EmailConfirm = "Confirm your Email";
 
 
     }

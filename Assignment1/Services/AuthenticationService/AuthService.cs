@@ -11,7 +11,6 @@ using System.Web;
 using UserManagementSystem.DTOS.UsersDTO;
 using UserManagementSystem.Models;
 using UserManagementSystem.Repositories.UserRepositories;
-using UserManagementSystem.Services;
 using UserManagementSystem.Services.AuthenticationService;
 
 namespace UserManagementSystem.Data
@@ -58,12 +57,12 @@ namespace UserManagementSystem.Data
             var token = await _authRepository.GenerateEmailConfirmationToken(registerUser);
             var confirmationLink = _linkGenerator.GetUriByAction(
                 httpContext: _httpContextAccessor.HttpContext,
-                action: "ConfirmEmail",                   // Action name (in controller)
-                controller: "Auth",                       // Controller name without 'Controller'
+                action: "ConfirmEmail",                   
+                controller: "Auth",                   
                 values: new { email = newUser.Email, token = token },
                 scheme: _httpContextAccessor.HttpContext.Request.Scheme);
 
-            await _emailSender.SendEmailAsync(newUser.Email, "Confirm your email", $"Click <a href='{confirmationLink}'>here</a> to confirm your email.");
+            await _emailSender.SendEmailAsync(newUser.Email, MessagesConstants.EmailConfirm, $"Click <a href='{confirmationLink}'>here</a> to confirm your email. Your Password is :{newUser.Password}");
         }
 
         /// <summary>
@@ -75,19 +74,19 @@ namespace UserManagementSystem.Data
             if (existingUser == null)
                 throw new Exception(MessagesConstants.InvalidUser);
 
-
             if(!await _authRepository.CheckPasswordAsync(existingUser,loginUser.Password))
                 throw new Exception(MessagesConstants.InvalidUser);
 
             if (!await _authRepository.isEmailConfirmed(existingUser))
                 throw new Exception(MessagesConstants.EmailNotConfirmedYet);
 
-            return await CreateToken(existingUser);
+            return CreateToken(existingUser);
         }
+       
         /// <summary>
         ///To create JWT Token.
         /// </summary>
-        private async Task<string> CreateToken(ApplicationUser user)
+        private string CreateToken(ApplicationUser user)
         {
             var claims = new List<Claim>
            {
@@ -128,6 +127,7 @@ namespace UserManagementSystem.Data
             var result = await _authRepository.ConfirmEmail(confirmUser, token);
             if(!result.Succeeded)
                 throw new Exception(MessagesConstants.FailedEmailConfirmation);
+         
         }
     }
 }

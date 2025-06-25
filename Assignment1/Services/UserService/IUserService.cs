@@ -1,6 +1,5 @@
 ﻿using UserManagementSystem.DTOS.UsersDTO;
 using UserManagementSystem.Models;
-using UserManagementSystem.Utils;
 
 namespace UserManagementSystem.Services.UserService
 {
@@ -14,7 +13,6 @@ namespace UserManagementSystem.Services.UserService
         Task<GetUsersDto> GetUserById(string Id);
         Task<ApplicationUser>  UpdateUser(string Id, RegisterUserDto updatedUser);
         Task DeleteUser(string Id);
-        Task<(List<GetUsersDto> Items, int TotalPages)> GetPagedUsers(PaginationQueryModel paginationQueryModel);
-
+        Task<PaginatedResponse<GetUsersDto>> GetPagedUsers(PaginationQueryModel paginationQueryModel);
     }
 }

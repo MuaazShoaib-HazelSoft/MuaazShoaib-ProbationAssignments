@@ -9,7 +9,6 @@ using UserManagementSystem.DTOS.UsersDTO;
 using UserManagementSystem.Models;
 using UserManagementSystem.Repositories.GenericRepositories;
 using UserManagementSystem.Repositories.UserRepositories;
-using UserManagementSystem.Utils;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
@@ -98,14 +97,14 @@ namespace UserManagementSystem.Services.UserService
             await _userRepository.SaveChangesAsync();
             return existingUser;
         }
-        public async Task<(List<GetUsersDto> Items, int TotalPages)> GetPagedUsers(PaginationQueryModel paginationQueryModel)
+        public async Task<PaginatedResponse<GetUsersDto>> GetPagedUsers(PaginationQueryModel paginationQueryModel)
         {
-            var (items,totalPages) = await _userRepository.GetPagedDataAsync(paginationQueryModel);
-            if (!items.Any())
+            var paginatedResponse =  await _userRepository.GetPagedDataAsync(paginationQueryModel);
+            if (!paginatedResponse.Items.Any())
                 throw new Exception(MessagesConstants.UnmatchedCriteria);
 
-            var userslist =  _userMapper.Map<List<GetUsersDto>>(items);
-            return (userslist,totalPages);
+            var usersList = _userMapper.Map<List<GetUsersDto>>(paginatedResponse.Items);
+            return new PaginatedResponse<GetUsersDto>(paginatedResponse.TotalPages, paginatedResponse.CurrentPage, paginatedResponse.PageSize, usersList);
         }
     }
 }

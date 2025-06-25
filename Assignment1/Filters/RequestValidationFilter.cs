@@ -1,20 +1,28 @@
-﻿using Microsoft.AspNetCore.Mvc.Filters;
-using UserManagementSystem.Utils;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
+using UserManagementSystem.Models;
+
 
 namespace UserManagementSystem.Filters
 {
-    public class RequestValidationFilter : IActionFilter
+    public class RequestValidationFilter : ActionFilterAttribute
     {
-        public void OnActionExecuted(ActionExecutedContext context)
+     
+        public override void OnActionExecuting(ActionExecutingContext context)
         {
-        }
-
-        public void OnActionExecuting(ActionExecutingContext context)
-        {
-            var result = RequestValidator.ValidateRequest(context.ModelState);
-            if (result != null)
+            if (!context.ModelState.IsValid)
             {
-                context.Result = result;
+                var errors = context.ModelState.Values
+                    .SelectMany(v => v.Errors)
+                    .Select(e => e.ErrorMessage)
+                    .ToList();
+
+                context.Result =  new BadRequestObjectResult(new ApiResponse<object>
+                (
+                    errors,
+                    "Validation failed",
+                    false
+                ));
             }
         }
     }

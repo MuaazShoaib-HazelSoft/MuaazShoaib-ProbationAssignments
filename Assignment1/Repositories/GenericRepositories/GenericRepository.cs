@@ -51,11 +51,11 @@ namespace UserManagementSystem.Repositories.GenericRepositories
         {
             return await _entity.FindAsync(Id);
         }
-        public async Task<(IEnumerable<T> Items, int totalPages)> GetPagedDataAsync(PaginationQueryModel paginationQueryModel)
+        public async Task<PaginatedResponse<T>> GetPagedDataAsync(PaginationQueryModel paginationQueryModel)
         {
             var query = QueryAble();
-            if (!string.IsNullOrEmpty(paginationQueryModel.SortColoumn))  
-                query = query.OrderBy(paginationQueryModel.SortColoumn);
+            if(!string.IsNullOrEmpty(paginationQueryModel.SortColoumn))
+             query = query.OrderBy(paginationQueryModel.SortColoumn);
 
             if (!string.IsNullOrEmpty(paginationQueryModel.Search))
                 query = query.Where(paginationQueryModel.Search);
@@ -64,7 +64,7 @@ namespace UserManagementSystem.Repositories.GenericRepositories
             int totalPages = (int)Math.Ceiling((double)totalCount / paginationQueryModel.PageSize);
             int skip = (paginationQueryModel.PageNumber - 1) * paginationQueryModel.PageSize;
             var items = await query.Skip(skip).Take(paginationQueryModel.PageSize).ToListAsync();
-            return (items,totalPages);
+            return new PaginatedResponse<T>(totalPages,paginationQueryModel.PageNumber,paginationQueryModel.PageSize,items);
         }
 
         public IQueryable<T> QueryAble()

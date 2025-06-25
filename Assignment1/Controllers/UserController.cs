@@ -1,14 +1,13 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 using UserManagementSystem;
 using UserManagementSystem.Controllers;
 using UserManagementSystem.Data;
 using UserManagementSystem.DTOS.UsersDTO;
 using UserManagementSystem.Models;
 using UserManagementSystem.Services.UserService;
-using UserManagementSystem.Utils;
+
 
 namespace UserManagement.Controllers
 {
@@ -103,13 +102,9 @@ namespace UserManagement.Controllers
         {
             try
             {
-                var (usersList,totalPages) = await _userService.GetPagedUsers(usersViewModel);
-                var response = new PaginatedResponse<GetUsersDto>
-                {
-                    TotalPages = totalPages,
-                    Items = usersList,
-                };
-                return Ok(response, MessagesConstants.UserFetched, true);
+                var paginatedResponse = await _userService.GetPagedUsers(usersViewModel);
+                
+                return Ok(paginatedResponse, MessagesConstants.UserFetched, true);
             }
             catch (Exception ex)
             {
