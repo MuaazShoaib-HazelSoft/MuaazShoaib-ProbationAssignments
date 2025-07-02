@@ -11,10 +11,14 @@ using System.Text;
 using UserManagementSystem;
 using UserManagementSystem.Data;
 using UserManagementSystem.Filters;
-using UserManagementSystem.Models;
+using UserManagementSystem.Models.ResponseModel;
+using UserManagementSystem.Models.UserModel;
 using UserManagementSystem.Repositories.GenericRepositories;
+using UserManagementSystem.Repositories.RolesRepositories;
 using UserManagementSystem.Repositories.UserRepositories;
 using UserManagementSystem.Services.AuthenticationService;
+using UserManagementSystem.Services.AuthenticationService.EmailService;
+using UserManagementSystem.Services.RoleService;
 using UserManagementSystem.Services.UserService;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
@@ -25,7 +29,10 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IRoleService, RoleService>();
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
+builder.Services.AddScoped<IRoleRepository, RoleRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IEmailSender, EmailSender>();
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 builder.Services.AddTransient<ContentTypeValidationMiddleware>();
@@ -34,7 +41,38 @@ builder.Services.AddDbContext<DataContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DatabaseConnection")));
 
 builder.Services.AddAutoMapper(typeof(Program));
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    // UI for authorize Token .
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "User Management API", Version = "v1" });
+
+    // Add JWT support for swagger apis.
+    var jwtSecurityScheme = new OpenApiSecurityScheme
+    {
+        BearerFormat = "JWT",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
+        Description = "Enter JWT Bearer token here (without 'Bearer' prefix)",
+
+        Reference = new OpenApiReference
+        {
+            Id = JwtBearerDefaults.AuthenticationScheme,
+            Type = ReferenceType.SecurityScheme
+        }
+    };
+
+    c.AddSecurityDefinition(jwtSecurityScheme.Reference.Id, jwtSecurityScheme);
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            jwtSecurityScheme,
+            Array.Empty<string>()
+        }
+    });
+});
+
 
 builder.Services.Configure<ApiBehaviorOptions>(options =>
 {

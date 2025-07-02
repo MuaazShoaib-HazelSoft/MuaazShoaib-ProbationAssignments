@@ -9,7 +9,7 @@ using UserManagementSystem.Models;
 using UserManagementSystem.Services.UserService;
 
 
-namespace UserManagement.Controllers
+namespace UserManagementSystem.Controllers.UserController
 {
     /// <summary>
     /// Controller to handle user related
@@ -31,7 +31,6 @@ namespace UserManagement.Controllers
         /// Retrieves all users.
         /// </summary
         [HttpGet("getallusers")]
-
         public async Task<IActionResult> GetAllUsers()
         {
             try
@@ -41,7 +40,7 @@ namespace UserManagement.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(null, ex.Message, false);
+                return BadRequest(ex.Message, false);
             }
         }
         /// <summary>
@@ -57,23 +56,23 @@ namespace UserManagement.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(null, ex.Message, false);
+                return BadRequest(ex.Message, false);
             }
         }
         /// <summary>
         /// Updates an existing user's details.
         /// </summary>
         [HttpPut("updateuserdetails/{Id?}")]
-        public async Task<IActionResult> UpdateUserDetails([FromRoute]  string Id, RegisterUserDto userToUpdate)
+        public async Task<IActionResult> UpdateUserDetails([FromRoute]  string Id, UpdateUserDto userToUpdate)
         {
             try
             { 
                 await _userService.UpdateUser(Id, userToUpdate);
-                return Ok(null, MessagesConstants.UserUpdated, true);
+                return Ok(MessagesConstants.UserUpdated, true);
             }
             catch (Exception ex)
             {
-                return BadRequest(null, ex.Message, false);
+                return BadRequest(ex.Message, false);
             }
         }
         /// <summary>
@@ -85,11 +84,24 @@ namespace UserManagement.Controllers
             try
             {
                  await _userService.DeleteUser(Id);
-                 return Ok(null, MessagesConstants.UserDeleted, true);
+                 return Ok(MessagesConstants.UserDeleted, true);
             }
             catch (Exception ex)
             {
-                return BadRequest(null, ex.Message, false);
+                return BadRequest(ex.Message, false);
+            }
+        }
+        [HttpPost("assignrolebyid")]
+        public async Task<IActionResult> AssignRolesToUser([FromQuery] string Id, [FromQuery] string roleName)
+        {
+            try
+            {
+                await _userService.AssignRoleToUser(Id,roleName);
+                return Ok(MessagesConstants.RoleAssigned, true);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message, false);
             }
         }
         /// <summary>
@@ -106,7 +118,7 @@ namespace UserManagement.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(null, ex.Message, false);
+                return BadRequest(ex.Message, false);
             }
         }
 

@@ -10,13 +10,14 @@ using System.Text;
 using System.Web;
 using UserManagementSystem.Data;
 using UserManagementSystem.DTOS.UsersDTO;
-using UserManagementSystem.Models;
+using UserManagementSystem.Models.UserModel;
 using UserManagementSystem.Repositories.UserRepositories;
+using UserManagementSystem.Services.AuthenticationService.EmailService;
 
 namespace UserManagementSystem.Services.AuthenticationService
 {
     /// <summary>
-    /// Auth Repository containing all auth methods..
+    /// Auth Service containing all auth methods..
     /// </summary>
     public class AuthService : IAuthService
     {
@@ -42,7 +43,6 @@ namespace UserManagementSystem.Services.AuthenticationService
         /// </summary>
         public async Task RegisterUser(RegisterUserDto newUser)
         {
-            
             var registerUser = _userMapper.Map<ApplicationUser>(newUser);
             var result = await _authRepository.CreateUserAsync(registerUser, newUser.Password);
             if (!result.Succeeded)
@@ -59,7 +59,6 @@ namespace UserManagementSystem.Services.AuthenticationService
                 scheme: _httpContextAccessor.HttpContext.Request.Scheme);
 
             await _emailSender.SendEmailAsync(newUser.Email, MessagesConstants.EmailConfirm, $"Click <a href='{confirmationLink}'>here</a> to confirm your email. Your Password is :{newUser.Password}");
-
         }
         /// <summary>
         /// Login through Email and Password and check 
@@ -72,7 +71,7 @@ namespace UserManagementSystem.Services.AuthenticationService
             if(!await _authRepository.CheckPasswordAsync(existingUser,loginUser.Password))
                 throw new Exception(MessagesConstants.InvalidUser);
 
-            if (!await _authRepository.isEmailConfirmed(existingUser))
+            if (!await _authRepository.IsEmailConfirmed(existingUser))
                 throw new Exception(MessagesConstants.EmailNotConfirmedYet);
 
             return CreateToken(existingUser);
@@ -117,6 +116,9 @@ namespace UserManagementSystem.Services.AuthenticationService
         public async Task ConfirmEmail(string email, string token)
         {
             var existingUser = await _authRepository.FindUserByEmailAsync(email);
+            if(existingUser == null)
+                throw new Exception(MessagesConstants.UserNotFound);
+
             var result = await _authRepository.ConfirmEmail(existingUser, token);
             if(!result.Succeeded)
                 throw new Exception(MessagesConstants.FailedEmailConfirmation);
@@ -125,13 +127,16 @@ namespace UserManagementSystem.Services.AuthenticationService
         /// To set the new password
         /// for users.
         /// </summary>
-        public async Task SetNewPassword(SetPasswordDto setPasswordDto)
+        public async Task SetNewPassword(string userId,SetPasswordDto setPasswordDto)
         {
-            var existingUser = await _authRepository.FindUserByEmailAsync(setPasswordDto.Email);
+            if (string.IsNullOrEmpty(userId))
+                throw new Exception(MessagesConstants.UnauthorizedToken);
+
+            var existingUser = await _authRepository.FindUserByIdAsync(userId);
             if (existingUser == null)
                 throw new Exception(MessagesConstants.UserNotFound);
-           
-            var result = await _authRepository.ChangePasswordAsync(existingUser, setPasswordDto.oldPassword, setPasswordDto.newPassword);
+
+            var result = await _authRepository.ChangePasswordAsync(existingUser, setPasswordDto.OldPassword, setPasswordDto.NewPassword);
             if (!result.Succeeded)
                 throw new Exception(string.Join(", ", result.Errors.Select(e => e.Description)));
         }

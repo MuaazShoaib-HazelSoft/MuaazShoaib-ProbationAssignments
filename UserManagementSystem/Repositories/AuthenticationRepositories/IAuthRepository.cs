@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using UserManagementSystem.Models;
+using UserManagementSystem.Models.UserModel;
 
 namespace UserManagementSystem.Repositories.UserRepositories
 {
@@ -14,11 +14,10 @@ namespace UserManagementSystem.Repositories.UserRepositories
         Task<IdentityResult> CreateUserAsync(ApplicationUser user, string password);
         Task<ApplicationUser> FindUserByEmailAsync(string email);
         Task<bool> CheckPasswordAsync(ApplicationUser user, string password);
-        Task<string> GeneratePasswordResetTokenAsync(ApplicationUser user);
-        Task<IdentityResult> ResetPasswordAsync(ApplicationUser user, string token, string newPassword);
         Task<string> GenerateEmailConfirmationToken(ApplicationUser user);
         Task<IdentityResult> ConfirmEmail(ApplicationUser user,string token);
-        Task<bool> isEmailConfirmed(ApplicationUser user);
+        Task<bool> IsEmailConfirmed(ApplicationUser user);
         Task<IdentityResult> ChangePasswordAsync(ApplicationUser user,string oldPassword,string newPassword);
+        Task<ApplicationUser> FindUserByIdAsync(string userId);
     }
 }

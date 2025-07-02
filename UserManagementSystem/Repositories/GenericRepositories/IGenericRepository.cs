@@ -1,5 +1,6 @@
 ﻿using System.Linq.Expressions;
 using UserManagementSystem.Models;
+using UserManagementSystem.Models.ResponseModel;
 
 namespace UserManagementSystem.Repositories.GenericRepositories
 {
@@ -17,7 +18,7 @@ namespace UserManagementSystem.Repositories.GenericRepositories
         Task<bool> DeleteAsync(T model);
         Task  SaveChangesAsync();
         IQueryable<T> QueryAble();
-        Task<PaginatedResponse<T>> GetPagedDataAsync(PaginationQueryModel paginationQueryModel);
+        Task<PaginatedResponse<T>> GetPagedDataAsync(PaginationQueryModel paginationQueryModel, IQueryable<T> sourceQuery);
 
     }
 }

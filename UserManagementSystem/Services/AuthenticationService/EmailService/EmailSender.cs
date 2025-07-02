@@ -3,7 +3,7 @@ using SendGrid;
 using SendGrid.Helpers.Mail;
 using System.Net.Mail;
 
-namespace UserManagementSystem.Services.AuthenticationService
+namespace UserManagementSystem.Services.AuthenticationService.EmailService
 {
     /// <summary>
     /// Class for sending email

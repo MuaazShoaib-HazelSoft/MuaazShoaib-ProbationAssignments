@@ -10,7 +10,7 @@ namespace UserManagementSystem.Data
     {
         Task  RegisterUser(RegisterUserDto newUser);
         Task<string> LoginUser(LoginUserDto loginUser);
-        Task ConfirmEmail(string email,string token);
-        Task SetNewPassword(SetPasswordDto setPasswordDto);
+        Task ConfirmEmail(string email,string token);   
+        Task SetNewPassword(string userId,SetPasswordDto setPasswordDto);
     }
 }

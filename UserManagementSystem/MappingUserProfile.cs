@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Identity;
+using UserManagementSystem.DTOS.RolesDto;
 using UserManagementSystem.DTOS.UsersDTO;
-using UserManagementSystem.Models;
+using UserManagementSystem.Models.UserModel;
 
 namespace UserManagementSystem
 {
@@ -13,7 +15,10 @@ namespace UserManagementSystem
         public MappingUserProfile()
         {
             CreateMap<ApplicationUser, GetUsersDto>();
+            CreateMap<ApplicationUser, GetUsersWithRolesDto>();
             CreateMap<RegisterUserDto, ApplicationUser>();
+            CreateMap<UpdateUserDto, ApplicationUser>();
+            CreateMap<IdentityRole, RoleDto>();
         }
     }
 }

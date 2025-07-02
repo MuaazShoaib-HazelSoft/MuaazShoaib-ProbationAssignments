@@ -2,15 +2,14 @@
 
 namespace UserManagementSystem.DTOS.UsersDTO
 {
+    /// Class of Set Password Dto
+    /// for updating the password.
+    /// </summary>
     public class SetPasswordDto
     {
-
-        [Required(ErrorMessage = MessagesConstants.EmailRequired)]
-        public string Email { get; set; } = "";
-        [Required(ErrorMessage = MessagesConstants.EmailRequired)]
-        public string oldPassword { get; set; } = "";
+        public string OldPassword { get; set; } = "";
 
         [Required(ErrorMessage = MessagesConstants.PasswordRequired)]
-        public string newPassword { get; set; } = "";
+        public string NewPassword { get; set; } = "";
     }
 }

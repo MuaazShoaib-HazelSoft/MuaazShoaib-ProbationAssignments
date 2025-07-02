@@ -1,5 +1,7 @@
-﻿using UserManagementSystem.DTOS.UsersDTO;
+﻿using Microsoft.AspNetCore.Mvc;
+using UserManagementSystem.DTOS.UsersDTO;
 using UserManagementSystem.Models;
+using UserManagementSystem.Models.ResponseModel;
 
 namespace UserManagementSystem.Services.UserService
 {
@@ -9,10 +11,11 @@ namespace UserManagementSystem.Services.UserService
     /// </summary>
     public interface IUserService
     {
-        Task<List<GetUsersDto>> GetAllUsers();
-        Task<GetUsersDto> GetUserById(string Id);
-        Task  UpdateUser(string Id, RegisterUserDto updatedUser);
+        Task<List<GetUsersWithRolesDto>> GetAllUsers();
+        Task<GetUsersWithRolesDto> GetUserById(string Id);
+        Task  UpdateUser(string Id,UpdateUserDto updatedUser);
         Task DeleteUser(string Id);
-        Task<PaginatedResponse<GetUsersDto>> GetPagedUsers(PaginationQueryModel paginationQueryModel);
+        Task<PaginatedResponse<GetUsersWithRolesDto>> GetPagedUsers(PaginationQueryModel paginationQueryModel);
+        Task AssignRoleToUser(string userId,string roleName);
     }
 }

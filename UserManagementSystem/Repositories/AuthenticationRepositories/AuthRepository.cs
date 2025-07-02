@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using UserManagementSystem.Models;
+using UserManagementSystem.Models.UserModel;
 
 namespace UserManagementSystem.Repositories.UserRepositories
 {
@@ -20,7 +20,6 @@ namespace UserManagementSystem.Repositories.UserRepositories
         {
             return await _userManager.ChangePasswordAsync(user, oldPassword, newPassword);
         }
-
         // To check the users correct password.
         public async Task<bool> CheckPasswordAsync(ApplicationUser user, string password)
         {
@@ -41,25 +40,19 @@ namespace UserManagementSystem.Repositories.UserRepositories
         {
             return await _userManager.FindByEmailAsync(email);
         }
-        // To generate token for email confirmation.
+        public async Task<ApplicationUser> FindUserByIdAsync(string userId)
+        {
+            return await _userManager.FindByIdAsync(userId);
+        }
+        // To generate the token for email confirmation.
         public async Task<string> GenerateEmailConfirmationToken(ApplicationUser user)
         {
             return await _userManager.GenerateEmailConfirmationTokenAsync(user);
         }
-        // To generate the token to reset the password.
-        public async Task<string> GeneratePasswordResetTokenAsync(ApplicationUser user)
-        {
-            return await _userManager.GeneratePasswordResetTokenAsync(user);
-        }
         // To check that user's email is confirmed or not.
-        public async Task<bool> isEmailConfirmed(ApplicationUser user)
+        public async Task<bool> IsEmailConfirmed(ApplicationUser user)
         {
             return await _userManager.IsEmailConfirmedAsync(user);
-        }
-        // To reset the password with help of token.
-        public async Task<IdentityResult> ResetPasswordAsync(ApplicationUser user, string token, string newPassword)
-        {
-            return await _userManager.ResetPasswordAsync(user, token, newPassword);
         }
     }
 }

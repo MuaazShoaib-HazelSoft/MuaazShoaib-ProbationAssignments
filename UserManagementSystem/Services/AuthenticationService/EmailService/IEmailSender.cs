@@ -1,10 +1,10 @@
-﻿namespace UserManagementSystem.Services.AuthenticationService
+﻿namespace UserManagementSystem.Services.AuthenticationService.EmailService
 {
     public interface IEmailSender
     {
         /// <summary>
-        /// Send Email Method to
-        /// be implemented.
+        /// interface containing Send Email Method 
+        /// to  be implemented.
         /// </summary>
         Task  SendEmailAsync(string toEmail, string subject, string htmlMessage);
     }

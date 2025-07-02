@@ -10,6 +10,11 @@
         public const string UserFetched = "User fetched successfully";
         public const string UserLogin = "User logged in successfully";
         public const string PasswordUpdated = "Password Updated Successfully.";
+        public const string RoleAdded = "Role created successfully";
+        public const string RoleUpdated = "Role updated successfully";
+        public const string RoleDeleted = "Role deleted successfully";
+        public const string RoleFetched = "Roles fetched successfully";
+        public const string RoleAssigned = "Role assigned successfully";
 
         // Error Messages
         public const string UserNotFound = "User not found";
@@ -32,6 +37,10 @@
         public const string EmailConfirmationSuccess = "Your Email has been Confirmed Successfully.";
         public const string EmailNotConfirmedYet = "Please Confirm Your Email before Logging In.";
         public const string EmailFailedtoSend = "Email Failed to Send.";
+        public const string InvalidPages = "Page Size or Page Number must be a valid positive number.";
+        public const string RoleExists = "Role Already Exists.";
+        public const string RoleNotFound = "Role Not Found.";
+        public const string NoRoleFound = "No Role Exists.";
 
         //Required Messages
         public const string NameRequired = "Username is Required";
@@ -39,7 +48,6 @@
         public const string PasswordRequired = "Password is Required";
         public const string AgeRequired = "Age is Required";
         public const string EmailConfirm = "Confirm your Email";
-
-
+        public const string RoleNameRequired = "Role name is Required";
     }
 }

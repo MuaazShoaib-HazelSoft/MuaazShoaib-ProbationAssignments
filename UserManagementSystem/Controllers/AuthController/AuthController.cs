@@ -5,7 +5,7 @@ using UserManagementSystem.DTOS.UsersDTO;
 
 
 
-namespace UserManagementSystem.Controllers
+namespace UserManagementSystem.Controllers.AuthController
 {
     /// <summary>
     /// Controller to handle all authentication
@@ -31,11 +31,11 @@ namespace UserManagementSystem.Controllers
             try
             {
                  await _authService.RegisterUser(newUser);
-                 return Ok(null, MessagesConstants.UserAdded, true);
+                 return Ok(MessagesConstants.UserAdded, true);
             }
             catch (Exception ex)
             {
-                return BadRequest(null, ex.Message, false);
+                return BadRequest(ex.Message, false);
             }
         }
         /// <summary>
@@ -52,7 +52,7 @@ namespace UserManagementSystem.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(null, ex.Message, false);
+                return BadRequest(ex.Message, false);
             }
         }
         /// <summary>
@@ -66,11 +66,11 @@ namespace UserManagementSystem.Controllers
             try
             {
                 await _authService.ConfirmEmail(email, token);
-                return Ok(null, MessagesConstants.EmailConfirmationSuccess,true);
+                return Ok(MessagesConstants.EmailConfirmationSuccess,true);
             }
             catch (Exception ex)
             {
-                return BadRequest(null, ex.Message, false);
+                return BadRequest(ex.Message, false);
             }
         }
         /// <summary>
@@ -82,12 +82,13 @@ namespace UserManagementSystem.Controllers
         {
             try
             {
-                await _authService.SetNewPassword(setPasswordDto);
-                return Ok(null, MessagesConstants.PasswordUpdated, true);
+                var userId = GetUserId();
+                await _authService.SetNewPassword(userId,setPasswordDto);
+                return Ok(MessagesConstants.PasswordUpdated, true);
             }
             catch (Exception ex)
             {
-                return BadRequest(null, ex.Message, false);
+                return BadRequest(ex.Message, false);
             }
         }
 

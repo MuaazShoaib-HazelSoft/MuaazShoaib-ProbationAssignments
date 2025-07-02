@@ -1,4 +1,4 @@
-﻿namespace UserManagementSystem.Models
+﻿namespace UserManagementSystem.Models.ResponseModel
 {
     /// <summary>
     /// Paginaton Response class to

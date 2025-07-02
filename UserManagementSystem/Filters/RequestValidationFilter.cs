@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using UserManagementSystem.Models;
+using UserManagementSystem.Models.ResponseModel;
 
 
 namespace UserManagementSystem.Filters

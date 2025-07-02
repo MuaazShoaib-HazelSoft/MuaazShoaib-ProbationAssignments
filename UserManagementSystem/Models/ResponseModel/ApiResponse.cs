@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 
-namespace UserManagementSystem.Models
+namespace UserManagementSystem.Models.ResponseModel
 {
     /// <summary>
     /// Api responses Class to 
@@ -17,6 +17,12 @@ namespace UserManagementSystem.Models
             Success = success;
             Message = message;
             Data = data;
+        }
+        public ApiResponse(string message, bool success)
+        {
+            Message = message;
+            Success = success;
+            Data = default;
         }
     }
 

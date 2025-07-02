@@ -1,6 +1,7 @@
 ﻿
 using Azure;
 using UserManagementSystem.Models;
+using UserManagementSystem.Models.ResponseModel;
 
 namespace UserManagementSystem
 {

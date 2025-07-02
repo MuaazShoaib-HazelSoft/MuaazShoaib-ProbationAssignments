@@ -5,6 +5,7 @@ using System.Linq.Expressions;
 using UserManagementSystem.Data;
 using UserManagementSystem.DTOS.UsersDTO;
 using UserManagementSystem.Models;
+using UserManagementSystem.Models.ResponseModel;
 
 namespace UserManagementSystem.Repositories.GenericRepositories
 {
@@ -60,10 +61,10 @@ namespace UserManagementSystem.Repositories.GenericRepositories
             return await _entity.FindAsync(Id);
         }
         // To get paged data with searching and sorting feature.
-        public async Task<PaginatedResponse<T>> GetPagedDataAsync(PaginationQueryModel paginationQueryModel)
+        public async Task<PaginatedResponse<T>> GetPagedDataAsync(PaginationQueryModel paginationQueryModel, IQueryable<T>? sourceQuery = null)
         {
-            var query = QueryAble();
-            if(!string.IsNullOrEmpty(paginationQueryModel.SortColoumn))
+            var query = sourceQuery ?? QueryAble();
+            if (!string.IsNullOrEmpty(paginationQueryModel.SortColoumn))
              query = query.OrderBy(paginationQueryModel.SortColoumn);
 
             if (!string.IsNullOrEmpty(paginationQueryModel.Search))
@@ -76,7 +77,7 @@ namespace UserManagementSystem.Repositories.GenericRepositories
             return new PaginatedResponse<T>(totalPages,paginationQueryModel.PageNumber,paginationQueryModel.PageSize,items);
         }
         // To query the data from database.
-        public IQueryable<T> QueryAble()
+        public virtual IQueryable<T> QueryAble()
         {
             return _entity.AsQueryable();
         }
