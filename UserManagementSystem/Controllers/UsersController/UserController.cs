@@ -91,6 +91,9 @@ namespace UserManagementSystem.Controllers.UserController
                 return BadRequest(ex.Message, false);
             }
         }
+        /// <summary>
+        /// Assign role to user by Id.
+        /// </summary>
         [HttpPost("assignrolebyid")]
         public async Task<IActionResult> AssignRolesToUser([FromQuery] string Id, [FromQuery] string roleName)
         {

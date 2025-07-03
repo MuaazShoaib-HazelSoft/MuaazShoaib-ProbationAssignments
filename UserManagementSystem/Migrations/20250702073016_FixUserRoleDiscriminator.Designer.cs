@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using UserManagementSystem.Data;
 
@@ -11,9 +12,11 @@ using UserManagementSystem.Data;
 namespace UserManagementSystem.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20250702073016_FixUserRoleDiscriminator")]
+    partial class FixUserRoleDiscriminator
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -173,41 +176,6 @@ namespace UserManagementSystem.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("UserManagementSystem.Models.CoursesModel.Course", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("CourseName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CourseName")
-                        .IsUnique();
-
-                    b.ToTable("Courses");
-                });
-
-            modelBuilder.Entity("UserManagementSystem.Models.UserCourseModel.UserCourse", b =>
-                {
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("CourseId")
-                        .HasColumnType("int");
-
-                    b.HasKey("UserId", "CourseId");
-
-                    b.HasIndex("CourseId");
-
-                    b.ToTable("UserCourses");
-                });
-
             modelBuilder.Entity("UserManagementSystem.Models.UserModel.ApplicationUser", b =>
                 {
                     b.Property<string>("Id")
@@ -335,25 +303,6 @@ namespace UserManagementSystem.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("UserManagementSystem.Models.UserCourseModel.UserCourse", b =>
-                {
-                    b.HasOne("UserManagementSystem.Models.CoursesModel.Course", "Course")
-                        .WithMany("UserCourses")
-                        .HasForeignKey("CourseId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("UserManagementSystem.Models.UserModel.ApplicationUser", "User")
-                        .WithMany("UserCourses")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Course");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("UserManagementSystem.Models.UserModel.UserRole", b =>
                 {
                     b.HasOne("UserManagementSystem.Models.UserModel.ApplicationRole", "Role")
@@ -373,15 +322,8 @@ namespace UserManagementSystem.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("UserManagementSystem.Models.CoursesModel.Course", b =>
-                {
-                    b.Navigation("UserCourses");
-                });
-
             modelBuilder.Entity("UserManagementSystem.Models.UserModel.ApplicationUser", b =>
                 {
-                    b.Navigation("UserCourses");
-
                     b.Navigation("UserRoles");
                 });
 

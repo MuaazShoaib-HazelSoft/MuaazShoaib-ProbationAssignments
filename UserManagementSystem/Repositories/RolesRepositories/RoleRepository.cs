@@ -59,6 +59,7 @@ namespace UserManagementSystem.Repositories.RolesRepositories
         // Method for Assigning Roles to Users.
         public async Task<IdentityResult> AssignRolesToUser(ApplicationUser user, string roleName)
         {
+
             return await _users.AddToRoleAsync(user, roleName);
         }
         // Method for Getting all the Roles of Users.

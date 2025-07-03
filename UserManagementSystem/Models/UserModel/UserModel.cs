@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations;
+using UserManagementSystem.Models.UserCourseModel;
 
 namespace UserManagementSystem.Models.UserModel
 {
@@ -9,6 +10,8 @@ namespace UserManagementSystem.Models.UserModel
     public class ApplicationUser:IdentityUser
     {
         public int Age { get; set; } = 0;
-        public ICollection<UserRole> UserRoles { get; set; }
+        public List<UserRole> UserRoles { get; set; }
+
+        public List<UserCourse> UserCourses { get; set; }
     }
 }

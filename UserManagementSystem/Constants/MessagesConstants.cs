@@ -15,6 +15,11 @@
         public const string RoleDeleted = "Role deleted successfully";
         public const string RoleFetched = "Roles fetched successfully";
         public const string RoleAssigned = "Role assigned successfully";
+        public const string CourseAdded = "Course Added successfully";
+        public const string CourseUpdated = "Course Updated successfully";
+        public const string CourseDeleted = "Course Deleted successfully";
+        public const string CourseFetched = "Courses Fetched successfully";
+        public const string CourseAssigned = "Course Assigned to User successfully";
 
         // Error Messages
         public const string UserNotFound = "User not found";
@@ -40,7 +45,15 @@
         public const string InvalidPages = "Page Size or Page Number must be a valid positive number.";
         public const string RoleExists = "Role Already Exists.";
         public const string RoleNotFound = "Role Not Found.";
+        public const string CourseNotFound = "Course Not Found.";
         public const string NoRoleFound = "No Role Exists.";
+        public const string NoCourseFound = "No Course Exists.";
+        public const string CourseDeletionFailed = "Course Failed to Delete.";
+        public const string CourseUpdationFailed = "Course Failed to Update.";
+        public const string CourseAddFailed = "Course Failed to Add";
+        public const string CourseAlreadyExists = "Course name already exists.";
+        public const string CourseEnrolled = "User is already Enrolled in this course.";
+        public const string CourseAssignFailed = "Failed to Assign the Course to User.";
 
         //Required Messages
         public const string NameRequired = "Username is Required";
@@ -49,5 +62,8 @@
         public const string AgeRequired = "Age is Required";
         public const string EmailConfirm = "Confirm your Email";
         public const string RoleNameRequired = "Role name is Required";
+        public const string CourseNameRequired = "Course name is Required";
+        public const string CourseIdRequired = "Course Id is Required";
+        public const string UserIdRequired = "User Id is Required";
     }
 }

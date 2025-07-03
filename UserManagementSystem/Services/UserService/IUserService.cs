@@ -11,11 +11,11 @@ namespace UserManagementSystem.Services.UserService
     /// </summary>
     public interface IUserService
     {
-        Task<List<GetUsersWithRolesDto>> GetAllUsers();
-        Task<GetUsersWithRolesDto> GetUserById(string Id);
+        Task<List<GetUsersWithRolesAndCourses>> GetAllUsers();
+        Task<GetUsersWithRolesAndCourses> GetUserById(string Id);
         Task  UpdateUser(string Id,UpdateUserDto updatedUser);
         Task DeleteUser(string Id);
-        Task<PaginatedResponse<GetUsersWithRolesDto>> GetPagedUsers(PaginationQueryModel paginationQueryModel);
+        Task<PaginatedResponse<GetUsersWithRolesAndCourses>> GetPagedUsers(PaginationQueryModel paginationQueryModel);
         Task AssignRoleToUser(string userId,string roleName);
     }
 }
